@@ -26,6 +26,7 @@ func (c *Controller) ListTasks(w http.ResponseWriter, r *http.Request) {
 	tasks := []Task{}
 	for _, task := range domainTaskObjs {
 		tasks = append(tasks, Task{
+			PublishedTaskId:   task.GetId(),
 			TaskFullName:      task.GetTaskFullName(),
 			MemoryLimitMbytes: task.GetMemoryLimitMBytes(),
 			CpuTimeLimitSecs:  task.GetCpuTimeLimitSecs(),
@@ -37,22 +38,3 @@ func (c *Controller) ListTasks(w http.ResponseWriter, r *http.Request) {
 		Tasks: tasks,
 	}, http.StatusOK)
 }
-
-// func (c *Controller) ListUsers(w http.ResponseWriter, r *http.Request) {
-// 	user, err := c.UserService.ListUsers()
-// 	if err != nil {
-// 		respondWithBadRequest(w, "user not found")
-// 		return
-// 	}
-
-// 	users := []Task{}
-// 	for _, u := range user {
-// 		users = append(users, Task{})
-// 	}
-
-// 	response := ListTasksResponse{
-// 		Users: users,
-// 	}
-
-// 	respondWithJSON(w, response, http.StatusOK)
-// }
