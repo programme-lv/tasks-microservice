@@ -22,14 +22,14 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(corsMiddleware)
 
+	controller.RegisterRoutes(r)
+
 	chiLambda := awschi.NewV2(r)
 
 	handler := func(ctx context.Context, req events.APIGatewayV2HTTPRequest) (
 		events.APIGatewayV2HTTPResponse, error) {
 		return chiLambda.ProxyWithContextV2(ctx, req)
 	}
-
-	controller.RegisterRoutes(r)
 
 	lambda.Start(handler)
 }

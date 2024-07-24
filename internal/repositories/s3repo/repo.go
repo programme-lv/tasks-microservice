@@ -6,34 +6,25 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pelletier/go-toml/v2"
 	"github.com/programme-lv/tasks-microservice/internal/domain"
 )
 
-var (
-	// testfilesBucket = "proglv-tests"
-	taskBucket = "proglv-tasks"
-	// pdfBucket       = "proglv-pdfs"
-)
-
 type taskS3Repo struct {
-	s3Client *s3.Client
+	s3Client   *s3.Client
+	taskBucket string
 }
 
-func NewTaskS3Repo() (*taskS3Repo, error) {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("eu-central-1"))
-	if err != nil {
-		return nil, fmt.Errorf("unable to load SDK config: %v", err)
-	}
-
-	s3Client := s3.NewFromConfig(cfg)
-	return &taskS3Repo{s3Client: s3Client}, nil
+func NewTaskS3Repo(s3Client *s3.Client, taskBucket string) (*taskS3Repo, error) {
+	return &taskS3Repo{
+		s3Client:   s3Client,
+		taskBucket: taskBucket,
+	}, nil
 }
 
 func (repo *taskS3Repo) GetTask(id string) (*domain.Task, error) {
-	manifest, err := getTaskManifestFromS3(repo, id)
+	manifest, err := repo.getTaskManifestFromS3(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get task manifest: %v", err)
 	}
@@ -73,9 +64,9 @@ func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
 	return task, nil
 }
 
-func getTaskManifestFromS3(repo *taskS3Repo, id string) (*TaskTomlManifest, error) {
+func (repo *taskS3Repo) getTaskManifestFromS3(id string) (*TaskTomlManifest, error) {
 	output, err := repo.s3Client.GetObject(context.TODO(), &s3.GetObjectInput{
-		Bucket: &taskBucket,
+		Bucket: &repo.taskBucket,
 		Key:    &id,
 	})
 	if err != nil {
@@ -98,7 +89,7 @@ func getTaskManifestFromS3(repo *taskS3Repo, id string) (*TaskTomlManifest, erro
 }
 
 func (repo *taskS3Repo) ListTasks() ([]domain.Task, error) {
-	manifests, err := listTaskManifestsFromS3(repo)
+	manifests, err := repo.listTaskManifestsFromS3()
 	if err != nil {
 		return nil, fmt.Errorf("failed to list task manifests: %v", err)
 	}
@@ -116,9 +107,9 @@ func (repo *taskS3Repo) ListTasks() ([]domain.Task, error) {
 	return tasks, nil
 }
 
-func listTaskManifestsFromS3(repo *taskS3Repo) ([]TaskTomlManifest, error) {
+func (repo *taskS3Repo) listTaskManifestsFromS3() ([]TaskTomlManifest, error) {
 	output, err := repo.s3Client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
-		Bucket: &taskBucket,
+		Bucket: &repo.taskBucket,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list objects: %v", err)
@@ -126,7 +117,7 @@ func listTaskManifestsFromS3(repo *taskS3Repo) ([]TaskTomlManifest, error) {
 
 	manifests := []TaskTomlManifest{}
 	for _, item := range output.Contents {
-		manifest, err := getTaskManifestFromS3(repo, *item.Key)
+		manifest, err := repo.getTaskManifestFromS3(*item.Key)
 		if err != nil {
 			log.Printf("failed to get task manifest: %v", err)
 			continue

@@ -1,40 +1,4 @@
-@host=0f6de9e9w5.execute-api.eu-central-1.amazonaws.com
-@uuid=1f5b8a10-67c2-4374-a378-0bc2a07bc682
-### Create User
-POST https://{{host}}/users/
-Content-Type: application/json
+@addr=http://localhost:8080
 
-{
-  "username": "Eliaa3",
-  "email": "johndoe3@example.com",
-  "password": "password123",
-  "firstname": "John",
-  "lastname": "Doe"
-}
-
-### Get User
-GET https://{{host}}/users/{{uuid}}
-
-### Update User
-PUT http://localhost:3000/users/{uuid}
-Content-Type: application/json
-
-{
-  "username": "johnupdated",
-  "email": "johnupdated@example.com"
-}
-
-### Delete User
-DELETE http://localhost:3000/users/{uuid}
-
-### List Users
-GET https://{{host}}/users/
-
-### Login
-POST https://{{host}}/auth/login
-Content-Type: application/json
-
-{
-  "username": "Eliaa",
-  "password": "password123"
-}
+### List tasks
+GET {{addr}}/tasks
