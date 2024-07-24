@@ -4,7 +4,7 @@ import (
 	"github.com/programme-lv/tasks-microservice/internal/domain"
 )
 
-func (x *TaskService) GetUser(id string) (*domain.Task, error) {
+func (x *TaskService) GetTask(id string) (*domain.Task, error) {
 	return x.repo.GetTask(id)
 }
 

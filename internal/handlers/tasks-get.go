@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type GetTaskResponse struct {
@@ -18,5 +20,28 @@ type Task struct {
 }
 
 func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
+	// take id param from url chi
 
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		respondWithBadRequest(w, "invalid task id")
+		return
+	}
+
+	task, err := c.TaskSrv.GetTask(id)
+	if err != nil {
+		respondWithBadRequest(w, "task not found")
+		return
+	}
+
+	respondWithJSON(w, GetTaskResponse{
+		Task: Task{
+			PublishedTaskId:   task.GetId(),
+			TaskFullName:      task.GetTaskFullName(),
+			MemoryLimitMbytes: task.GetMemoryLimitMBytes(),
+			CpuTimeLimitSecs:  task.GetCpuTimeLimitSecs(),
+			OriginOlympiad:    task.GetOriginOlympiad(),
+			LvPdfStatementSha: task.GetLvOrOtherPdfSha256(),
+		},
+	}, http.StatusOK)
 }
