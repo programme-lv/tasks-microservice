@@ -2,20 +2,25 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/programme-lv/tasks-microservice/internal/handlers"
+	"github.com/programme-lv/tasks-microservice/internal/repositories/ddbtaskrepo"
 	"github.com/programme-lv/tasks-microservice/internal/service"
 
 	awschi "github.com/awslabs/aws-lambda-go-api-proxy/chi"
 )
 
 func main() {
-	taskService := service.NewTaskService(nil)
+	taskService := service.NewTaskService(getDynamoDbRepo())
 	controller := handlers.NewController(taskService)
 
 	r := chi.NewRouter()
@@ -49,4 +54,20 @@ func corsMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func getDynamoDbRepo() service.TaskRepo {
+	tableName := os.Getenv("TASKS_TABLE_NAME")
+	if tableName == "" {
+		panic("USERS_TABLE_NAME environment variable is not set")
+	}
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion("eu-central-1"))
+	if err != nil {
+		panic(fmt.Sprintf("unable to load SDK config, %v", err))
+	}
+	dynamoClient := dynamodb.NewFromConfig(cfg)
+	repo := ddbtaskrepo.NewDynamoDbTaskRepo(dynamoClient,
+		tableName)
+	return repo
 }

@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  TaskServiceFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+      SamResourceId: TaskServiceFunction
+    Properties:
+      PackageType: Zip
+      Handler: bootstrap
+      CodeUri: TaskServiceFunction
+      Runtime: provided.al2023
