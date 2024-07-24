@@ -8,8 +8,8 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/programme-lv/users-microservice/internal/handlers"
-	"github.com/programme-lv/users-microservice/internal/service"
+	"github.com/programme-lv/tasks-microservice/internal/handlers"
+	"github.com/programme-lv/tasks-microservice/internal/service"
 
 	awschi "github.com/awslabs/aws-lambda-go-api-proxy/chi"
 )
