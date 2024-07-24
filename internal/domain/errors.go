@@ -24,13 +24,22 @@ const (
 	StateConflictErrorCode = 409
 )
 
-
-func NewTaskFullNameIsRequiredError() *DomainError {
+func errorTaskFullNameIsRequired() *DomainError {
 	return &DomainError{
 		StatusCode: StateConflictErrorCode,
 		I18NErrors: map[string]error{
 			"en": fmt.Errorf("task name is required"),
 			"lv": fmt.Errorf("uzdevuma nosaukums ir obligatīls"),
+		},
+	}
+}
+
+func errorDifficultyMustBeBetweenOneAndFive() *DomainError {
+	return &DomainError{
+		StatusCode: StateConflictErrorCode,
+		I18NErrors: map[string]error{
+			"en": fmt.Errorf("difficulty must be between 1 and 5"),
+			"lv": fmt.Errorf("grūts nekorekts ar 1 un 5"),
 		},
 	}
 }

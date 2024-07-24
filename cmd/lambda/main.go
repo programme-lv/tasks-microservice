@@ -29,6 +29,8 @@ func main() {
 		return chiLambda.ProxyWithContextV2(ctx, req)
 	}
 
+	controller.RegisterRoutes(r)
+
 	lambda.Start(handler)
 }
 

@@ -41,7 +41,7 @@ func NewTask(id string, fullName string) (*Task, error) {
 
 func (t *Task) SetTaskFullName(fullName string) error {
 	if fullName == "" {
-		return fmt.Errorf("task full name cannot be empty")
+		return errorTaskFullNameIsRequired()
 	}
 	t.TaskFullName = fullName
 	return nil
@@ -59,7 +59,7 @@ func (t *Task) SetOriginOlympiad(origin string) {
 	t.OriginOlympiad = origin
 }
 
-func (t *Task) SetPdfStatementSha256References(statements []PdfSha256Ref) {
+func (t *Task) SetPdfStatement(statements []PdfSha256Ref) {
 	t.PdfStatements = statements
 }
 
@@ -67,9 +67,10 @@ func (t *Task) SetProblemTags(tags []string) {
 	t.ProblemTags = tags
 }
 
-func (t *Task) SetDifficulty(difficulty int) {
+func (t *Task) SetDifficulty(difficulty int) error {
 	if difficulty < 1 || difficulty > 5 {
-
+		return errorDifficultyMustBeBetweenOneAndFive()
 	}
 	t.Difficulty = difficulty
+	return nil
 }
