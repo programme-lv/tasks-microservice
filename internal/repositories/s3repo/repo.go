@@ -38,6 +38,11 @@ func (repo *taskS3Repo) GetTask(id string) (*domain.Task, error) {
 		return nil, fmt.Errorf("failed to get task manifest: %v", err)
 	}
 
+	return constructTaskFromManifest(id, manifest)
+}
+
+func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
+	*domain.Task, error) {
 	task, err := domain.NewTask(id, manifest.TaskFullName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create task: %v", err)

@@ -74,3 +74,10 @@ func (t *Task) SetDifficulty(difficulty int) error {
 	t.Difficulty = difficulty
 	return nil
 }
+
+func (t *Task) GetLvOrOtherPdfSha256() string {
+	if len(t.PdfStatements) == 0 {
+		return ""
+	}
+	return t.PdfStatements[0].Sha256
+}
