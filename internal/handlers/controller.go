@@ -7,11 +7,11 @@ import (
 )
 
 type Controller struct {
-	UserService *service.TaskService
+	TaskSrv *service.TaskService
 }
 
-func NewController(userService *service.TaskService) *Controller {
-	return &Controller{UserService: userService}
+func NewController(taskSrv *service.TaskService) *Controller {
+	return &Controller{TaskSrv: taskSrv}
 }
 
 func (c *Controller) RegisterRoutes(r chi.Router) {

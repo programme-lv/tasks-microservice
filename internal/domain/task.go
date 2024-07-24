@@ -3,15 +3,50 @@ package domain
 import "fmt"
 
 type Task struct {
-	Id string
+	id string
 
-	TaskFullName      string
-	MemoryLimitMBytes int
-	CpuTimeLimitSecs  float64
-	Difficulty        int // [1;5]
-	OriginOlympiad    string
-	ProblemTags       []string
-	PdfStatements     []PdfSha256Ref
+	taskFullName      string
+	memoryLimitMBytes int
+	cpuTimeLimitSecs  float64
+	difficulty        int // [1;5]
+	originOlympiad    string
+	problemTags       []string
+	pdfStatements     []PdfSha256Ref
+}
+
+func (t *Task) GetId() string {
+	return t.id
+}
+
+func (t *Task) GetTaskFullName() string {
+	return t.taskFullName
+}
+
+func (t *Task) GetMemoryLimitMBytes() int {
+	return t.memoryLimitMBytes
+}
+
+func (t *Task) GetCpuTimeLimitSecs() float64 {
+	return t.cpuTimeLimitSecs
+}
+
+func (t *Task) GetDifficulty() int {
+	return t.difficulty
+}
+
+func (t *Task) GetOriginOlympiad() string {
+	return t.originOlympiad
+}
+
+func (t *Task) GetProblemTags() []string {
+	return t.problemTags
+}
+
+func (t *Task) GetLvOrOtherPdfSha256() string {
+	if len(t.pdfStatements) == 0 {
+		return ""
+	}
+	return t.pdfStatements[0].Sha256
 }
 
 type PdfSha256Ref struct {
@@ -21,14 +56,14 @@ type PdfSha256Ref struct {
 
 func NewTask(id string, fullName string) (*Task, error) {
 	task := &Task{
-		Id:                id,
-		TaskFullName:      "",
-		MemoryLimitMBytes: 256,
-		CpuTimeLimitSecs:  1.0,
-		Difficulty:        1,
-		OriginOlympiad:    "",
-		ProblemTags:       []string{},
-		PdfStatements:     []PdfSha256Ref{},
+		id:                id,
+		taskFullName:      "",
+		memoryLimitMBytes: 256,
+		cpuTimeLimitSecs:  1.0,
+		difficulty:        1,
+		originOlympiad:    "",
+		problemTags:       []string{},
+		pdfStatements:     []PdfSha256Ref{},
 	}
 
 	err := task.SetTaskFullName(fullName)
@@ -43,41 +78,34 @@ func (t *Task) SetTaskFullName(fullName string) error {
 	if fullName == "" {
 		return errorTaskFullNameIsRequired()
 	}
-	t.TaskFullName = fullName
+	t.taskFullName = fullName
 	return nil
 }
 
 func (t *Task) SetMemoryLimitMBytes(memoryLimit int) {
-	t.MemoryLimitMBytes = memoryLimit
+	t.memoryLimitMBytes = memoryLimit
 }
 
 func (t *Task) SetCpuTimeLimitSecs(cpuTimeLimit float64) {
-	t.CpuTimeLimitSecs = cpuTimeLimit
+	t.cpuTimeLimitSecs = cpuTimeLimit
 }
 
 func (t *Task) SetOriginOlympiad(origin string) {
-	t.OriginOlympiad = origin
+	t.originOlympiad = origin
 }
 
 func (t *Task) SetPdfStatement(statements []PdfSha256Ref) {
-	t.PdfStatements = statements
+	t.pdfStatements = statements
 }
 
 func (t *Task) SetProblemTags(tags []string) {
-	t.ProblemTags = tags
+	t.problemTags = tags
 }
 
 func (t *Task) SetDifficulty(difficulty int) error {
 	if difficulty < 1 || difficulty > 5 {
 		return errorDifficultyMustBeBetweenOneAndFive()
 	}
-	t.Difficulty = difficulty
+	t.difficulty = difficulty
 	return nil
-}
-
-func (t *Task) GetLvOrOtherPdfSha256() string {
-	if len(t.PdfStatements) == 0 {
-		return ""
-	}
-	return t.PdfStatements[0].Sha256
 }

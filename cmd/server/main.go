@@ -14,7 +14,7 @@ import (
 	"github.com/programme-lv/tasks-microservice/internal/service"
 )
 
-const testBucket = "proglv-tests"
+const taskBucket = "proglv-tasks"
 
 func main() {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
@@ -24,8 +24,12 @@ func main() {
 	}
 	s3Client := s3.NewFromConfig(cfg)
 
-	s3repo.NewTaskS3Repo(s3Client, testBucket)
-	taskService := service.NewTaskService(nil)
+	repo, err := s3repo.NewTaskS3Repo(s3Client, taskBucket)
+	if err != nil {
+		panic(fmt.Sprintf("failed to create task repo: %v", err))
+	}
+
+	taskService := service.NewTaskService(repo)
 	controller := handlers.NewController(taskService)
 
 	r := chi.NewRouter()
