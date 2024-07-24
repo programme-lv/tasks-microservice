@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	testfilesBucket = "proglv-tests"
-	taskBucket      = "proglv-tasks"
-	pdfBucket       = "proglv-pdfs"
+	// testfilesBucket = "proglv-tests"
+	taskBucket = "proglv-tasks"
+	// pdfBucket       = "proglv-pdfs"
 )
 
 type taskS3Repo struct {
@@ -38,7 +38,12 @@ func (repo *taskS3Repo) GetTask(id string) (*domain.Task, error) {
 		return nil, fmt.Errorf("failed to get task manifest: %v", err)
 	}
 
-	return constructTaskFromManifest(id, manifest)
+	task, err := constructTaskFromManifest(id, manifest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to construct task: %v", err)
+	}
+
+	return task, nil
 }
 
 func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
@@ -93,24 +98,42 @@ func getTaskManifestFromS3(repo *taskS3Repo, id string) (*TaskTomlManifest, erro
 }
 
 func (repo *taskS3Repo) ListTasks() ([]domain.Task, error) {
-	bucket := taskBucket
+	manifests, err := listTaskManifestsFromS3(repo)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list task manifests: %v", err)
+	}
 
+	tasks := []domain.Task{}
+	for _, manifest := range manifests {
+		task, err := constructTaskFromManifest(manifest.TaskFullName, &manifest)
+		if err != nil {
+			return nil, fmt.Errorf("failed to construct task: %v", err)
+		}
+
+		tasks = append(tasks, *task)
+	}
+
+	return tasks, nil
+}
+
+func listTaskManifestsFromS3(repo *taskS3Repo) ([]TaskTomlManifest, error) {
 	output, err := repo.s3Client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
-		Bucket: &bucket,
+		Bucket: &taskBucket,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list objects: %v", err)
 	}
 
-	tasks := []domain.Task{}
+	manifests := []TaskTomlManifest{}
 	for _, item := range output.Contents {
-		task, err := repo.GetTask(*item.Key)
+		manifest, err := getTaskManifestFromS3(repo, *item.Key)
 		if err != nil {
-			log.Printf("failed to get task: %v", err)
+			log.Printf("failed to get task manifest: %v", err)
 			continue
 		}
-		tasks = append(tasks, *task)
+		manifests = append(manifests, *manifest)
 	}
 
-	return tasks, nil
+	return manifests, nil
+
 }
