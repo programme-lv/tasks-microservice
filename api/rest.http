@@ -2,3 +2,6 @@
 
 ### List tasks
 GET {{addr}}/tasks
+
+### Get task
+GET {{addr}}/tasks/kvadrputekl

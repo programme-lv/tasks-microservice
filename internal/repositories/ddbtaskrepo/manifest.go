@@ -1,4 +1,10 @@
-package s3repo
+package ddbtaskrepo
+
+import (
+	"fmt"
+
+	"github.com/programme-lv/tasks-microservice/internal/domain"
+)
 
 type TaskTomlManifest struct {
 	TestSHA256s  []TestfileSHA256Ref     `toml:"tests_sha256s"`
@@ -42,4 +48,31 @@ type MDStatement struct {
 	Output   string  `toml:"output"`
 	Notes    *string `toml:"notes"`
 	Scoring  *string `toml:"scoring"`
+}
+
+func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
+	*domain.Task, error) {
+	task, err := domain.NewTask(id, manifest.TaskFullName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create task: %v", err)
+	}
+
+	task.SetCpuTimeLimitSecs(manifest.CpuTimeInSecs)
+	task.SetDifficulty(manifest.Difficulty)
+	task.SetMemoryLimitMBytes(manifest.MemoryLimMB)
+	task.SetOriginOlympiad(manifest.OriginOlympiad)
+	task.SetProblemTags(manifest.ProblemTags)
+	task.SetTaskFullName(manifest.TaskFullName)
+
+	pdfs := []domain.PdfSha256Ref{}
+	for _, pdf := range manifest.PDFSHA256s {
+		pdfs = append(pdfs, domain.PdfSha256Ref{
+			Language: pdf.Language,
+			Sha256:   pdf.SHA256,
+		})
+	}
+
+	task.SetPdfStatement(pdfs)
+
+	return task, nil
 }
