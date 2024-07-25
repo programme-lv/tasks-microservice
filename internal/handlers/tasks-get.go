@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/programme-lv/tasks-microservice/internal/domain"
 )
 
 type GetTaskResponse struct {
@@ -17,6 +18,7 @@ type Task struct {
 	CpuTimeLimitSecs  float64 `json:"cpu_time_limit_seconds"`
 	OriginOlympiad    string  `json:"origin_olympiad,omitempty"`
 	LvPdfStatementSha string  `json:"lv_pdf_statement_sha,omitempty"`
+	DifficultyRating  int     `json:"difficulty_rating,omitempty"`
 }
 
 func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
@@ -35,13 +37,18 @@ func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, GetTaskResponse{
-		Task: Task{
-			PublishedTaskId:   task.GetId(),
-			TaskFullName:      task.GetTaskFullName(),
-			MemoryLimitMbytes: task.GetMemoryLimitMBytes(),
-			CpuTimeLimitSecs:  task.GetCpuTimeLimitSecs(),
-			OriginOlympiad:    task.GetOriginOlympiad(),
-			LvPdfStatementSha: task.GetLvOrOtherPdfSha256(),
-		},
+		Task: mapDomainTaskToTaskResponse(task),
 	}, http.StatusOK)
+}
+
+func mapDomainTaskToTaskResponse(task *domain.Task) Task {
+	return Task{
+		PublishedTaskId:   task.GetId(),
+		TaskFullName:      task.GetTaskFullName(),
+		MemoryLimitMbytes: task.GetMemoryLimitMBytes(),
+		CpuTimeLimitSecs:  task.GetCpuTimeLimitSecs(),
+		OriginOlympiad:    task.GetOriginOlympiad(),
+		LvPdfStatementSha: task.GetLvOrOtherPdfSha256(),
+		DifficultyRating:  task.GetDifficulty(),
+	}
 }

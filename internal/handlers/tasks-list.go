@@ -25,14 +25,7 @@ func (c *Controller) ListTasks(w http.ResponseWriter, r *http.Request) {
 
 	tasks := []Task{}
 	for _, task := range domainTaskObjs {
-		tasks = append(tasks, Task{
-			PublishedTaskId:   task.GetId(),
-			TaskFullName:      task.GetTaskFullName(),
-			MemoryLimitMbytes: task.GetMemoryLimitMBytes(),
-			CpuTimeLimitSecs:  task.GetCpuTimeLimitSecs(),
-			OriginOlympiad:    task.GetOriginOlympiad(),
-			LvPdfStatementSha: task.GetLvOrOtherPdfSha256(),
-		})
+		tasks = append(tasks, mapDomainTaskToTaskResponse(&task))
 	}
 	respondWithJSON(w, ListTasksResponse{
 		Tasks: tasks,
