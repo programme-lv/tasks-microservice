@@ -23,6 +23,8 @@ type Task struct {
 	IllustrationImgUrl string       `json:"illustration_img_url,omitempty"`
 	DefaultMdStatement *MdStatement `json:"default_md_statement,omitempty"`
 	DefaultPdfSUrl     string       `json:"default_pdf_statement_url,omitempty"`
+
+	OriginNotes map[string]string `json:"origin_notes,omitempty"`
 }
 
 type MdStatement struct {
@@ -90,5 +92,6 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 		IllustrationImgUrl: illustrationImgUrl,
 		DefaultMdStatement: resMdStatement,
 		DefaultPdfSUrl:     defaultPdfStatementUrl,
+		OriginNotes:        task.GetOriginNotes(),
 	}
 }

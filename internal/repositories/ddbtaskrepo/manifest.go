@@ -22,6 +22,9 @@ type TaskTomlManifest struct {
 	TestGroups      []TestGroup `toml:"test_groups"`
 
 	IllustrationImg string `toml:"illustration_img_s3objkey, omitempty"`
+
+	OriginNotes       map[string]string `toml:"origin_notes,omitempty"`
+	OriginInstitution string            `toml:"origin_institution,omitempty"`
 }
 
 type TestfileSHA256Ref struct {
@@ -66,6 +69,7 @@ func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
 	task.SetProblemTags(manifest.ProblemTags)
 	task.SetTaskFullName(manifest.TaskFullName)
 	task.SetIllustrationImgObjKey(manifest.IllustrationImg)
+	task.SetOriginNotes(manifest.OriginNotes)
 
 	for _, mdStatement := range manifest.MDStatements {
 		language := ""

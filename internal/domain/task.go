@@ -15,6 +15,8 @@ type Task struct {
 	mdStatements      map[string]*MarkdownStatement // map[language]statement
 
 	illustrationImgObjKey string
+
+	OriginNotes map[string]string
 }
 
 type MarkdownStatement struct {
@@ -23,6 +25,14 @@ type MarkdownStatement struct {
 	Output  string
 	Notes   *string
 	Scoring *string
+}
+
+func (t *Task) GetOriginNotes() map[string]string {
+	return t.OriginNotes
+}
+
+func (t *Task) SetOriginNotes(notes map[string]string) {
+	t.OriginNotes = notes
 }
 
 func (t *Task) GetDefaultMarkdownStatement() *MarkdownStatement {
