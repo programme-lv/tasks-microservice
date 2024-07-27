@@ -22,6 +22,7 @@ type Task struct {
 	DifficultyRating   int          `json:"difficulty_rating,omitempty"`
 	IllustrationImgUrl string       `json:"illustration_img_url,omitempty"`
 	DefaultMdStatement *MdStatement `json:"default_md_statement,omitempty"`
+	DefaultPdfSUrl     string       `json:"default_pdf_statement_url,omitempty"`
 }
 
 type MdStatement struct {
@@ -70,6 +71,14 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 			Scoring: defaultMdStatement.Scoring,
 		}
 	}
+
+	defaultPdfStatementUrl := ""
+	if publicBucketCloudFrontHost != "" && task.GetLvOrOtherPdfSha256() != "" {
+		defaultPdfStatementUrl = fmt.Sprintf(
+			"http://%s/task-pdf-statements/%s.pdf",
+			publicBucketCloudFrontHost, task.GetLvOrOtherPdfSha256())
+	}
+
 	return Task{
 		PublishedTaskId:    task.GetId(),
 		TaskFullName:       task.GetTaskFullName(),
@@ -80,5 +89,6 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 		DifficultyRating:   task.GetDifficulty(),
 		IllustrationImgUrl: illustrationImgUrl,
 		DefaultMdStatement: resMdStatement,
+		DefaultPdfSUrl:     defaultPdfStatementUrl,
 	}
 }

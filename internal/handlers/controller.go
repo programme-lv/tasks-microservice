@@ -29,6 +29,4 @@ func (c *Controller) RegisterRoutes(r chi.Router) {
 		})
 	})
 
-	r.Get("/task-pdfs/{sha}", c.GetPdf)
-
 }

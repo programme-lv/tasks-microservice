@@ -11,8 +11,8 @@ type Task struct {
 	difficulty        int // [1;5]
 	originOlympiad    string
 	problemTags       []string
-	pdfStatements     []PdfSha256Ref
-	mdStatements      map[string]MarkdownStatement // map[language]statement
+	pdfStatements     []pdfSha256Ref
+	mdStatements      map[string]*MarkdownStatement // map[language]statement
 
 	illustrationImgObjKey string
 }
@@ -26,26 +26,16 @@ type MarkdownStatement struct {
 }
 
 func (t *Task) GetDefaultMarkdownStatement() *MarkdownStatement {
-	lv, ok := t.mdStatements["lv"]
-	if ok {
-		return &lv
+	for _, lang := range []string{"lv", "en", ""} {
+		if _, ok := t.mdStatements[lang]; ok {
+			return t.mdStatements[lang]
+		}
 	}
-
-	en, ok := t.mdStatements["en"]
-	if ok {
-		return &en
-	}
-
-	empty, ok := t.mdStatements[""]
-	if ok {
-		return &empty
-	}
-
 	return nil
 }
 
 func (t *Task) AddMarkdownStatement(language string, statement MarkdownStatement) {
-	t.mdStatements[language] = statement
+	t.mdStatements[language] = &statement
 }
 
 func (t *Task) GetIllustrationImgObjKey() string {
@@ -91,7 +81,7 @@ func (t *Task) GetLvOrOtherPdfSha256() string {
 	return t.pdfStatements[0].Sha256
 }
 
-type PdfSha256Ref struct {
+type pdfSha256Ref struct {
 	Language string
 	Sha256   string
 }
@@ -105,8 +95,8 @@ func NewTask(id string, fullName string) (*Task, error) {
 		difficulty:            1,
 		originOlympiad:        "",
 		problemTags:           []string{},
-		pdfStatements:         []PdfSha256Ref{},
-		mdStatements:          map[string]MarkdownStatement{},
+		pdfStatements:         []pdfSha256Ref{},
+		mdStatements:          map[string]*MarkdownStatement{},
 		illustrationImgObjKey: "",
 	}
 
@@ -138,8 +128,8 @@ func (t *Task) SetOriginOlympiad(origin string) {
 	t.originOlympiad = origin
 }
 
-func (t *Task) SetPdfStatement(statements []PdfSha256Ref) {
-	t.pdfStatements = statements
+func (t *Task) AddPdfStatementSha256(language string, sha256 string) {
+	t.pdfStatements = append(t.pdfStatements, pdfSha256Ref{Language: language, Sha256: sha256})
 }
 
 func (t *Task) SetProblemTags(tags []string) {

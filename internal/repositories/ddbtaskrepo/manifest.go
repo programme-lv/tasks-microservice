@@ -80,15 +80,10 @@ func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
 			Scoring: mdStatement.Scoring,
 		})
 	}
-	pdfs := []domain.PdfSha256Ref{}
-	for _, pdf := range manifest.PDFSHA256s {
-		pdfs = append(pdfs, domain.PdfSha256Ref{
-			Language: pdf.Language,
-			Sha256:   pdf.SHA256,
-		})
-	}
 
-	task.SetPdfStatement(pdfs)
+	for _, pdf := range manifest.PDFSHA256s {
+		task.AddPdfStatementSha256(pdf.Language, pdf.SHA256)
+	}
 
 	return task, nil
 }
