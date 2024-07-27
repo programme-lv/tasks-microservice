@@ -9,7 +9,7 @@ type ListTasksResponse struct {
 }
 
 func (c *Controller) ListTasks(w http.ResponseWriter, r *http.Request) {
-	domainTaskObjs, err := c.TaskSrv.ListTasks()
+	domainTaskObjs, err := c.taskSrv.ListTasks()
 	if err != nil {
 		// TODO: handle error in a better way
 		// slog.Warn("failed to list tasks", "error", err)
@@ -25,7 +25,7 @@ func (c *Controller) ListTasks(w http.ResponseWriter, r *http.Request) {
 
 	tasks := []Task{}
 	for _, task := range domainTaskObjs {
-		tasks = append(tasks, mapDomainTaskToTaskResponse(&task))
+		tasks = append(tasks, mapDomainTaskToTaskResponse(&task, c.publicBucketCloudFrontHost))
 	}
 	respondWithJSON(w, ListTasksResponse{
 		Tasks: tasks,

@@ -7,11 +7,13 @@ import (
 )
 
 type Controller struct {
-	TaskSrv *service.TaskService
+	taskSrv *service.TaskService
+
+	publicBucketCloudFrontHost string
 }
 
 func NewController(taskSrv *service.TaskService) *Controller {
-	return &Controller{TaskSrv: taskSrv}
+	return &Controller{taskSrv: taskSrv}
 }
 
 func (c *Controller) RegisterRoutes(r chi.Router) {

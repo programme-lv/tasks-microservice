@@ -12,6 +12,12 @@ type Task struct {
 	originOlympiad    string
 	problemTags       []string
 	pdfStatements     []PdfSha256Ref
+
+	illustrationImgObjKey string
+}
+
+func (t *Task) GetIllustrationImgObjKey() string {
+	return t.illustrationImgObjKey
 }
 
 func (t *Task) GetId() string {

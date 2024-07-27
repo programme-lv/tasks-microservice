@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -12,13 +13,14 @@ type GetTaskResponse struct {
 }
 
 type Task struct {
-	PublishedTaskId   string  `json:"published_task_id"`
-	TaskFullName      string  `json:"task_full_name"`
-	MemoryLimitMbytes int     `json:"memory_limit_megabytes"`
-	CpuTimeLimitSecs  float64 `json:"cpu_time_limit_seconds"`
-	OriginOlympiad    string  `json:"origin_olympiad,omitempty"`
-	LvPdfStatementSha string  `json:"lv_pdf_statement_sha,omitempty"`
-	DifficultyRating  int     `json:"difficulty_rating,omitempty"`
+	PublishedTaskId    string  `json:"published_task_id"`
+	TaskFullName       string  `json:"task_full_name"`
+	MemoryLimitMbytes  int     `json:"memory_limit_megabytes"`
+	CpuTimeLimitSecs   float64 `json:"cpu_time_limit_seconds"`
+	OriginOlympiad     string  `json:"origin_olympiad,omitempty"`
+	LvPdfStatementSha  string  `json:"lv_pdf_statement_sha,omitempty"`
+	DifficultyRating   int     `json:"difficulty_rating,omitempty"`
+	IllustrationImgUrl string  `json:"illustration_img_url,omitempty"`
 }
 
 func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
@@ -30,25 +32,36 @@ func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := c.TaskSrv.GetTask(id)
+	task, err := c.taskSrv.GetTask(id)
 	if err != nil {
 		respondWithBadRequest(w, "task not found")
 		return
 	}
 
 	respondWithJSON(w, GetTaskResponse{
-		Task: mapDomainTaskToTaskResponse(task),
+		Task: mapDomainTaskToTaskResponse(task, c.publicBucketCloudFrontHost),
 	}, http.StatusOK)
 }
 
-func mapDomainTaskToTaskResponse(task *domain.Task) Task {
+func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost string) Task {
+	illustrationImgUrl := ""
+	if publicBucketCloudFrontHost != "" && task.GetIllustrationImgObjKey() != "" {
+		illustrationImgUrl = fmt.Sprintf("http://%s/%s",
+			publicBucketCloudFrontHost, task.GetIllustrationImgObjKey())
+	}
+
 	return Task{
-		PublishedTaskId:   task.GetId(),
-		TaskFullName:      task.GetTaskFullName(),
-		MemoryLimitMbytes: task.GetMemoryLimitMBytes(),
-		CpuTimeLimitSecs:  task.GetCpuTimeLimitSecs(),
-		OriginOlympiad:    task.GetOriginOlympiad(),
-		LvPdfStatementSha: task.GetLvOrOtherPdfSha256(),
-		DifficultyRating:  task.GetDifficulty(),
+		PublishedTaskId:    task.GetId(),
+		TaskFullName:       task.GetTaskFullName(),
+		MemoryLimitMbytes:  task.GetMemoryLimitMBytes(),
+		CpuTimeLimitSecs:   task.GetCpuTimeLimitSecs(),
+		OriginOlympiad:     task.GetOriginOlympiad(),
+		LvPdfStatementSha:  task.GetLvOrOtherPdfSha256(),
+		DifficultyRating:   task.GetDifficulty(),
+		IllustrationImgUrl: illustrationImgUrl,
 	}
 }
+
+// func (t *Task) GetIllustrationImgUrl() string {
+// 	return fmt.Sprintf("http://%s/%s", t.publicBucketCFrontHost, t.illustrationImgObjKey)
+// }
