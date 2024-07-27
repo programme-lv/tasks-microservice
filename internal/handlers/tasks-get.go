@@ -56,7 +56,7 @@ func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost string) Task {
 	illustrationImgUrl := ""
 	if publicBucketCloudFrontHost != "" && task.GetIllustrationImgObjKey() != "" {
-		illustrationImgUrl = fmt.Sprintf("http://%s/%s",
+		illustrationImgUrl = fmt.Sprintf("https://%s/%s",
 			publicBucketCloudFrontHost, task.GetIllustrationImgObjKey())
 	}
 
@@ -75,7 +75,7 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 	defaultPdfStatementUrl := ""
 	if publicBucketCloudFrontHost != "" && task.GetLvOrOtherPdfSha256() != "" {
 		defaultPdfStatementUrl = fmt.Sprintf(
-			"http://%s/task-pdf-statements/%s.pdf",
+			"https://%s/task-pdf-statements/%s.pdf",
 			publicBucketCloudFrontHost, task.GetLvOrOtherPdfSha256())
 	}
 
