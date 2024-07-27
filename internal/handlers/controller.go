@@ -13,7 +13,10 @@ type Controller struct {
 }
 
 func NewController(taskSrv *service.TaskService) *Controller {
-	return &Controller{taskSrv: taskSrv}
+	return &Controller{
+		taskSrv:                    taskSrv,
+		publicBucketCloudFrontHost: "dvhk4hiwp1rmf.cloudfront.net",
+	}
 }
 
 func (c *Controller) RegisterRoutes(r chi.Router) {
