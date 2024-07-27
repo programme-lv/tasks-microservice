@@ -67,6 +67,19 @@ func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
 	task.SetTaskFullName(manifest.TaskFullName)
 	task.SetIllustrationImgObjKey(manifest.IllustrationImg)
 
+	for _, mdStatement := range manifest.MDStatements {
+		language := ""
+		if mdStatement.Language != nil {
+			language = *mdStatement.Language
+		}
+		task.AddMarkdownStatement(language, domain.MarkdownStatement{
+			Story:   mdStatement.Story,
+			Input:   mdStatement.Input,
+			Output:  mdStatement.Output,
+			Notes:   mdStatement.Notes,
+			Scoring: mdStatement.Scoring,
+		})
+	}
 	pdfs := []domain.PdfSha256Ref{}
 	for _, pdf := range manifest.PDFSHA256s {
 		pdfs = append(pdfs, domain.PdfSha256Ref{

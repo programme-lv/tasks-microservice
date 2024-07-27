@@ -12,8 +12,40 @@ type Task struct {
 	originOlympiad    string
 	problemTags       []string
 	pdfStatements     []PdfSha256Ref
+	mdStatements      map[string]MarkdownStatement // map[language]statement
 
 	illustrationImgObjKey string
+}
+
+type MarkdownStatement struct {
+	Story   string
+	Input   string
+	Output  string
+	Notes   *string
+	Scoring *string
+}
+
+func (t *Task) GetDefaultMarkdownStatement() *MarkdownStatement {
+	lv, ok := t.mdStatements["lv"]
+	if ok {
+		return &lv
+	}
+
+	en, ok := t.mdStatements["en"]
+	if ok {
+		return &en
+	}
+
+	empty, ok := t.mdStatements[""]
+	if ok {
+		return &empty
+	}
+
+	return nil
+}
+
+func (t *Task) AddMarkdownStatement(language string, statement MarkdownStatement) {
+	t.mdStatements[language] = statement
 }
 
 func (t *Task) GetIllustrationImgObjKey() string {
@@ -66,14 +98,16 @@ type PdfSha256Ref struct {
 
 func NewTask(id string, fullName string) (*Task, error) {
 	task := &Task{
-		id:                id,
-		taskFullName:      "",
-		memoryLimitMBytes: 256,
-		cpuTimeLimitSecs:  1.0,
-		difficulty:        1,
-		originOlympiad:    "",
-		problemTags:       []string{},
-		pdfStatements:     []PdfSha256Ref{},
+		id:                    id,
+		taskFullName:          "",
+		memoryLimitMBytes:     256,
+		cpuTimeLimitSecs:      1.0,
+		difficulty:            1,
+		originOlympiad:        "",
+		problemTags:           []string{},
+		pdfStatements:         []PdfSha256Ref{},
+		mdStatements:          map[string]MarkdownStatement{},
+		illustrationImgObjKey: "",
 	}
 
 	err := task.SetTaskFullName(fullName)

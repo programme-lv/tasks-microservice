@@ -13,14 +13,23 @@ type GetTaskResponse struct {
 }
 
 type Task struct {
-	PublishedTaskId    string  `json:"published_task_id"`
-	TaskFullName       string  `json:"task_full_name"`
-	MemoryLimitMbytes  int     `json:"memory_limit_megabytes"`
-	CpuTimeLimitSecs   float64 `json:"cpu_time_limit_seconds"`
-	OriginOlympiad     string  `json:"origin_olympiad,omitempty"`
-	LvPdfStatementSha  string  `json:"lv_pdf_statement_sha,omitempty"`
-	DifficultyRating   int     `json:"difficulty_rating,omitempty"`
-	IllustrationImgUrl string  `json:"illustration_img_url,omitempty"`
+	PublishedTaskId    string       `json:"published_task_id"`
+	TaskFullName       string       `json:"task_full_name"`
+	MemoryLimitMbytes  int          `json:"memory_limit_megabytes"`
+	CpuTimeLimitSecs   float64      `json:"cpu_time_limit_seconds"`
+	OriginOlympiad     string       `json:"origin_olympiad,omitempty"`
+	LvPdfStatementSha  string       `json:"lv_pdf_statement_sha,omitempty"`
+	DifficultyRating   int          `json:"difficulty_rating,omitempty"`
+	IllustrationImgUrl string       `json:"illustration_img_url,omitempty"`
+	DefaultMdStatement *MdStatement `json:"default_md_statement,omitempty"`
+}
+
+type MdStatement struct {
+	Story   string  `json:"story"`
+	Input   string  `json:"input"`
+	Output  string  `json:"output"`
+	Notes   *string `json:"notes,omitempty"`
+	Scoring *string `json:"scoring,omitempty"`
 }
 
 func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +59,17 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 			publicBucketCloudFrontHost, task.GetIllustrationImgObjKey())
 	}
 
+	defaultMdStatement := task.GetDefaultMarkdownStatement()
+	var resMdStatement *MdStatement = nil
+	if defaultMdStatement != nil {
+		resMdStatement = &MdStatement{
+			Story:   defaultMdStatement.Story,
+			Input:   defaultMdStatement.Input,
+			Output:  defaultMdStatement.Output,
+			Notes:   defaultMdStatement.Notes,
+			Scoring: defaultMdStatement.Scoring,
+		}
+	}
 	return Task{
 		PublishedTaskId:    task.GetId(),
 		TaskFullName:       task.GetTaskFullName(),
@@ -59,9 +79,6 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 		LvPdfStatementSha:  task.GetLvOrOtherPdfSha256(),
 		DifficultyRating:   task.GetDifficulty(),
 		IllustrationImgUrl: illustrationImgUrl,
+		DefaultMdStatement: resMdStatement,
 	}
 }
-
-// func (t *Task) GetIllustrationImgUrl() string {
-// 	return fmt.Sprintf("http://%s/%s", t.publicBucketCFrontHost, t.illustrationImgObjKey)
-// }

@@ -11,7 +11,6 @@ type ListTasksResponse struct {
 func (c *Controller) ListTasks(w http.ResponseWriter, r *http.Request) {
 	domainTaskObjs, err := c.taskSrv.ListTasks()
 	if err != nil {
-		// TODO: handle error in a better way
 		// slog.Warn("failed to list tasks", "error", err)
 		// domainErr := domain.DomainError{}
 		// if errors.As(err, &domainErr) {
