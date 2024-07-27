@@ -20,6 +20,8 @@ type TaskTomlManifest struct {
 	OriginOlympiad  string      `toml:"origin_olympiad"`
 	VisibleInputSTs []int       `toml:"visible_input_subtasks"`
 	TestGroups      []TestGroup `toml:"test_groups"`
+
+	IllustrationImg string `toml:"illustration_img_s3objkey, omitempty"`
 }
 
 type TestfileSHA256Ref struct {
@@ -63,6 +65,7 @@ func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
 	task.SetOriginOlympiad(manifest.OriginOlympiad)
 	task.SetProblemTags(manifest.ProblemTags)
 	task.SetTaskFullName(manifest.TaskFullName)
+	task.SetIllustrationImgObjKey(manifest.IllustrationImg)
 
 	pdfs := []domain.PdfSha256Ref{}
 	for _, pdf := range manifest.PDFSHA256s {

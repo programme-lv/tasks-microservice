@@ -20,6 +20,10 @@ func (t *Task) GetIllustrationImgObjKey() string {
 	return t.illustrationImgObjKey
 }
 
+func (t *Task) SetIllustrationImgObjKey(key string) {
+	t.illustrationImgObjKey = key
+}
+
 func (t *Task) GetId() string {
 	return t.id
 }
