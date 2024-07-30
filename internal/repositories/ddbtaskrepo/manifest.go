@@ -25,6 +25,14 @@ type TaskTomlManifest struct {
 
 	OriginNotes       map[string]string `toml:"origin_notes,omitempty"`
 	OriginInstitution string            `toml:"origin_institution,omitempty"`
+
+	Examples []Example `toml:"examples,omitempty"`
+}
+
+type Example struct {
+	Input  string `toml:"input"`
+	Output string `toml:"output"`
+	MdNote string `toml:"md_note,omitempty"`
 }
 
 type TestfileSHA256Ref struct {
@@ -82,6 +90,18 @@ func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
 			Output:  mdStatement.Output,
 			Notes:   mdStatement.Notes,
 			Scoring: mdStatement.Scoring,
+		})
+	}
+
+	for _, example := range manifest.Examples {
+		var mdNotePtr *string = nil
+		if example.MdNote != "" {
+			mdNotePtr = &example.MdNote
+		}
+		task.AddExample(domain.Example{
+			Input:  example.Input,
+			Output: example.Output,
+			MdNote: mdNotePtr,
 		})
 	}
 

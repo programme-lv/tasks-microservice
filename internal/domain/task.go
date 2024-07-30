@@ -13,10 +13,17 @@ type Task struct {
 	problemTags       []string
 	pdfStatements     []pdfSha256Ref
 	mdStatements      map[string]*MarkdownStatement // map[language]statement
+	examples          []Example
 
 	illustrationImgObjKey string
 
-	OriginNotes map[string]string
+	originNotes map[string]string
+}
+
+type Example struct {
+	Input  string
+	Output string
+	MdNote *string
 }
 
 type MarkdownStatement struct {
@@ -27,12 +34,20 @@ type MarkdownStatement struct {
 	Scoring *string
 }
 
+func (t *Task) GetExamples() []Example {
+	return t.examples
+}
+
+func (t *Task) AddExample(example Example) {
+	t.examples = append(t.examples, example)
+}
+
 func (t *Task) GetOriginNotes() map[string]string {
-	return t.OriginNotes
+	return t.originNotes
 }
 
 func (t *Task) SetOriginNotes(notes map[string]string) {
-	t.OriginNotes = notes
+	t.originNotes = notes
 }
 
 func (t *Task) GetDefaultMarkdownStatement() *MarkdownStatement {
@@ -107,7 +122,9 @@ func NewTask(id string, fullName string) (*Task, error) {
 		problemTags:           []string{},
 		pdfStatements:         []pdfSha256Ref{},
 		mdStatements:          map[string]*MarkdownStatement{},
+		examples:              []Example{},
 		illustrationImgObjKey: "",
+		originNotes:           map[string]string{},
 	}
 
 	err := task.SetTaskFullName(fullName)

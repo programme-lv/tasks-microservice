@@ -13,18 +13,24 @@ type GetTaskResponse struct {
 }
 
 type Task struct {
-	PublishedTaskId    string       `json:"published_task_id"`
-	TaskFullName       string       `json:"task_full_name"`
-	MemoryLimitMbytes  int          `json:"memory_limit_megabytes"`
-	CpuTimeLimitSecs   float64      `json:"cpu_time_limit_seconds"`
-	OriginOlympiad     string       `json:"origin_olympiad,omitempty"`
-	LvPdfStatementSha  string       `json:"lv_pdf_statement_sha,omitempty"`
-	DifficultyRating   int          `json:"difficulty_rating,omitempty"`
-	IllustrationImgUrl string       `json:"illustration_img_url,omitempty"`
-	DefaultMdStatement *MdStatement `json:"default_md_statement,omitempty"`
-	DefaultPdfSUrl     string       `json:"default_pdf_statement_url,omitempty"`
+	PublishedTaskId    string            `json:"published_task_id"`
+	TaskFullName       string            `json:"task_full_name"`
+	MemoryLimitMbytes  int               `json:"memory_limit_megabytes"`
+	CpuTimeLimitSecs   float64           `json:"cpu_time_limit_seconds"`
+	OriginOlympiad     string            `json:"origin_olympiad,omitempty"`
+	LvPdfStatementSha  string            `json:"lv_pdf_statement_sha,omitempty"`
+	DifficultyRating   int               `json:"difficulty_rating,omitempty"`
+	IllustrationImgUrl string            `json:"illustration_img_url,omitempty"`
+	DefaultMdStatement *MdStatement      `json:"default_md_statement,omitempty"`
+	DefaultPdfSUrl     string            `json:"default_pdf_statement_url,omitempty"`
+	Examples           []Example         `json:"examples,omitempty"`
+	OriginNotes        map[string]string `json:"origin_notes,omitempty"`
+}
 
-	OriginNotes map[string]string `json:"origin_notes,omitempty"`
+type Example struct {
+	Input  string  `json:"input"`
+	Output string  `json:"output"`
+	MdNote *string `json:"md_note,omitempty"`
 }
 
 type MdStatement struct {
@@ -62,6 +68,15 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 			publicBucketCloudFrontHost, task.GetIllustrationImgObjKey())
 	}
 
+	examples := make([]Example, 0)
+	for _, example := range task.GetExamples() {
+		examples = append(examples, Example{
+			Input:  example.Input,
+			Output: example.Output,
+			MdNote: example.MdNote,
+		})
+	}
+
 	defaultMdStatement := task.GetDefaultMarkdownStatement()
 	var resMdStatement *MdStatement = nil
 	if defaultMdStatement != nil {
@@ -92,6 +107,7 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 		IllustrationImgUrl: illustrationImgUrl,
 		DefaultMdStatement: resMdStatement,
 		DefaultPdfSUrl:     defaultPdfStatementUrl,
+		Examples:           examples,
 		OriginNotes:        task.GetOriginNotes(),
 	}
 }
