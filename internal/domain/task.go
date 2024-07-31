@@ -13,6 +13,7 @@ type Task struct {
 	problemTags       []string
 	pdfStatements     []pdfSha256Ref
 	mdStatements      map[string]*MarkdownStatement // map[language]statement
+	ImgUuidToObjKey   map[string]string
 	examples          []Example
 
 	illustrationImgObjKey string
@@ -32,6 +33,14 @@ type MarkdownStatement struct {
 	Output  string
 	Notes   *string
 	Scoring *string
+}
+
+func (t *Task) GetImgUuidToObjKey() map[string]string {
+	return t.ImgUuidToObjKey
+}
+
+func (t *Task) SetImgUuidToObjKey(imgUuidToObjKey map[string]string) {
+	t.ImgUuidToObjKey = imgUuidToObjKey
 }
 
 func (t *Task) GetExamples() []Example {

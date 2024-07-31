@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/programme-lv/tasks-microservice/internal/domain"
@@ -77,15 +78,28 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 		})
 	}
 
-	defaultMdStatement := task.GetDefaultMarkdownStatement()
+	mdStImgUuidToObjKey := task.GetImgUuidToObjKey()
+	mdStatement := task.GetDefaultMarkdownStatement()
+	if mdStatement != nil {
+		for _, section := range []*string{&mdStatement.Story, &mdStatement.Input, &mdStatement.Output,
+			mdStatement.Notes, mdStatement.Scoring} {
+			if section != nil {
+				for imgUuid, objKey := range mdStImgUuidToObjKey {
+					url := fmt.Sprintf("https://%s/%s", publicBucketCloudFrontHost, objKey)
+					*section = strings.ReplaceAll(*section, imgUuid, url)
+				}
+			}
+		}
+	}
+
 	var resMdStatement *MdStatement = nil
-	if defaultMdStatement != nil {
+	if mdStatement != nil {
 		resMdStatement = &MdStatement{
-			Story:   defaultMdStatement.Story,
-			Input:   defaultMdStatement.Input,
-			Output:  defaultMdStatement.Output,
-			Notes:   defaultMdStatement.Notes,
-			Scoring: defaultMdStatement.Scoring,
+			Story:   mdStatement.Story,
+			Input:   mdStatement.Input,
+			Output:  mdStatement.Output,
+			Notes:   mdStatement.Notes,
+			Scoring: mdStatement.Scoring,
 		}
 	}
 

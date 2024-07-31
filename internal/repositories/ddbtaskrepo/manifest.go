@@ -7,9 +7,10 @@ import (
 )
 
 type TaskTomlManifest struct {
-	TestSHA256s  []TestfileSHA256Ref     `toml:"tests_sha256s"`
-	PDFSHA256s   []PDFStatemenSHA256tRef `toml:"pdf_statements_sha256s"`
-	MDStatements []MDStatement           `toml:"md_statements"`
+	TestSHA256s     []TestfileSHA256Ref     `toml:"tests_sha256s"`
+	PDFSHA256s      []PDFStatemenSHA256tRef `toml:"pdf_statements_sha256s"`
+	MDStatements    []MDStatement           `toml:"md_statements"`
+	ImgUuidToObjKey map[string]string       `toml:"img_uuid_to_obj_key"`
 
 	TaskFullName    string      `toml:"task_full_name"`
 	MemoryLimMB     int         `toml:"memory_lim_megabytes"`
@@ -78,6 +79,7 @@ func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
 	task.SetTaskFullName(manifest.TaskFullName)
 	task.SetIllustrationImgObjKey(manifest.IllustrationImg)
 	task.SetOriginNotes(manifest.OriginNotes)
+	task.SetImgUuidToObjKey(manifest.ImgUuidToObjKey)
 
 	for _, mdStatement := range manifest.MDStatements {
 		language := ""
