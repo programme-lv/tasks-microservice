@@ -59,7 +59,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 func getDynamoDbRepo() service.TaskRepo {
 	tableName := os.Getenv("TASKS_TABLE_NAME")
 	if tableName == "" {
-		panic("USERS_TABLE_NAME environment variable is not set")
+		panic("TASKS_TABLE_NAME environment variable is not set")
 	}
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithRegion("eu-central-1"))
