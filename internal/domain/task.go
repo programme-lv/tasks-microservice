@@ -19,6 +19,9 @@ type Task struct {
 	illustrationImgObjKey string
 
 	originNotes map[string]string
+
+	visInpSubtasks []int
+	visInpStInputs map[int][]string
 }
 
 type Example struct {
@@ -33,6 +36,30 @@ type MarkdownStatement struct {
 	Output  string
 	Notes   *string
 	Scoring *string
+}
+
+type VisInpStInputs struct {
+	Subtask int
+	Inputs  []string
+}
+
+func (t *Task) GetVisInpStInputs() []VisInpStInputs {
+	res := make([]VisInpStInputs, 0, len(t.visInpStInputs))
+	for _, st := range t.visInpSubtasks {
+		res = append(res, VisInpStInputs{
+			Subtask: st,
+			Inputs:  t.visInpStInputs[st],
+		})
+	}
+	return res
+}
+
+func (t *Task) AddVisibleInputSubtask(subtask int, inputs []string) {
+	t.visInpSubtasks = append(t.visInpSubtasks, subtask)
+	if t.visInpStInputs == nil {
+		t.visInpStInputs = make(map[int][]string)
+	}
+	t.visInpStInputs[subtask] = inputs
 }
 
 func (t *Task) GetImgUuidToObjKey() map[string]string {

@@ -26,6 +26,12 @@ type Task struct {
 	DefaultPdfSUrl     string            `json:"default_pdf_statement_url,omitempty"`
 	Examples           []Example         `json:"examples,omitempty"`
 	OriginNotes        map[string]string `json:"origin_notes,omitempty"`
+	VisInpStInputs     []StInputs        `json:"visible_input_subtasks,omitempty"`
+}
+
+type StInputs struct {
+	Subtask int      `json:"subtask"`
+	Inputs  []string `json:"inputs"`
 }
 
 type Example struct {
@@ -110,6 +116,15 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 			publicBucketCloudFrontHost, task.GetLvOrOtherPdfSha256())
 	}
 
+	visInpStInputs := make([]StInputs, 0)
+	for _, visInpSt := range task.GetVisInpStInputs() {
+		visInpSt := StInputs{
+			Subtask: visInpSt.Subtask,
+			Inputs:  visInpSt.Inputs,
+		}
+		visInpStInputs = append(visInpStInputs, visInpSt)
+	}
+
 	return Task{
 		PublishedTaskId:    task.GetId(),
 		TaskFullName:       task.GetTaskFullName(),
@@ -123,5 +138,6 @@ func mapDomainTaskToTaskResponse(task *domain.Task, publicBucketCloudFrontHost s
 		DefaultPdfSUrl:     defaultPdfStatementUrl,
 		Examples:           examples,
 		OriginNotes:        task.GetOriginNotes(),
+		VisInpStInputs:     visInpStInputs,
 	}
 }

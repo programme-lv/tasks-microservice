@@ -20,6 +20,7 @@ type TaskTomlManifest struct {
 	TaskAuthors     []string    `toml:"task_authors"`
 	OriginOlympiad  string      `toml:"origin_olympiad"`
 	VisibleInputSTs []int       `toml:"visible_input_subtasks"`
+	VisInpStInputs  []StInputs  `toml:"vis_inp_subtask_inputs"`
 	TestGroups      []TestGroup `toml:"test_groups"`
 
 	IllustrationImg string `toml:"illustration_img_s3objkey, omitempty"`
@@ -28,6 +29,11 @@ type TaskTomlManifest struct {
 	OriginInstitution string            `toml:"origin_institution,omitempty"`
 
 	Examples []Example `toml:"examples,omitempty"`
+}
+
+type StInputs struct {
+	Subtask int      `toml:"subtask"`
+	Inputs  []string `toml:"inputs,multiline"`
 }
 
 type Example struct {
@@ -109,6 +115,14 @@ func constructTaskFromManifest(id string, manifest *TaskTomlManifest) (
 
 	for _, pdf := range manifest.PDFSHA256s {
 		task.AddPdfStatementSha256(pdf.Language, pdf.SHA256)
+	}
+
+	for _, visInpSt := range manifest.VisibleInputSTs {
+		for _, visInpStInput := range manifest.VisInpStInputs {
+			if visInpStInput.Subtask == visInpSt {
+				task.AddVisibleInputSubtask(visInpSt, visInpStInput.Inputs)
+			}
+		}
 	}
 
 	return task, nil
