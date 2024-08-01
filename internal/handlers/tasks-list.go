@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -11,14 +12,8 @@ type ListTasksResponse struct {
 func (c *Controller) ListTasks(w http.ResponseWriter, r *http.Request) {
 	domainTaskObjs, err := c.taskSrv.ListTasks()
 	if err != nil {
-		// slog.Warn("failed to list tasks", "error", err)
-		// domainErr := domain.DomainError{}
-		// if errors.As(err, &domainErr) {
-		// 	if domainErr.IsErrorPublic() {
-		// 		respond
-		// 	}
-		// }
-		respondWithInternalServerError(w, "failed to list tasks")
+		log.Println("failed to list tasks", "error", err)
+		respondWithJSON(w, "failed to list tasks", http.StatusInternalServerError)
 		return
 	}
 

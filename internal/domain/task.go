@@ -22,6 +22,27 @@ type Task struct {
 
 	visInpSubtasks []int
 	visInpStInputs map[int][]string
+
+	tests      []TestSha256Ref
+	testGroups []TestGroup
+	subtasks   []Subtask
+}
+
+type TestSha256Ref struct {
+	TestId       int64
+	InputSha256  string
+	AnswerSha256 string
+}
+
+type TestGroup struct {
+	GroupId    int
+	TestIds    []int
+	SubtaskIds []int
+}
+
+type Subtask struct {
+	SubtaskId int
+	TestIds   []int
 }
 
 type Example struct {
@@ -205,4 +226,37 @@ func (t *Task) SetDifficulty(difficulty int) error {
 	}
 	t.difficulty = difficulty
 	return nil
+}
+
+func (t *Task) SetTests(tests []TestSha256Ref) error {
+	for _, test := range tests {
+		if test.InputSha256 == "" || test.AnswerSha256 == "" {
+			return errorEmptyTestSha256()
+		}
+		if test.TestId <= 0 {
+			return errorTestIdMustBePositive()
+		}
+	}
+	t.tests = tests
+	return nil
+}
+
+func (t *Task) GetTests() []TestSha256Ref {
+	return t.tests
+}
+
+func (t *Task) SetTestGroups(groups []TestGroup) {
+	t.testGroups = groups
+}
+
+func (t *Task) GetTestGroups() []TestGroup {
+	return t.testGroups
+}
+
+func (t *Task) SetSubtasks(subtasks []Subtask) {
+	t.subtasks = subtasks
+}
+
+func (t *Task) GetSubtasks() []Subtask {
+	return t.subtasks
 }

@@ -16,11 +16,3 @@ func respondWithJSON(w http.ResponseWriter, body interface{}, statusCode int) {
 	w.WriteHeader(statusCode)
 	w.Write(jsonResponse)
 }
-
-func respondWithBadRequest(w http.ResponseWriter, msg string) {
-	http.Error(w, msg, http.StatusBadRequest)
-}
-
-func respondWithInternalServerError(w http.ResponseWriter, msg string) {
-	http.Error(w, msg, http.StatusInternalServerError)
-}

@@ -53,13 +53,13 @@ func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		respondWithBadRequest(w, "invalid task id")
+		respondWithJSON(w, "invalid task id", http.StatusBadRequest)
 		return
 	}
 
 	task, err := c.taskSrv.GetTask(id)
 	if err != nil {
-		respondWithBadRequest(w, "task not found")
+		respondWithJSON(w, "task not found", http.StatusNotFound)
 		return
 	}
 

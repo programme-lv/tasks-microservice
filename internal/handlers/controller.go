@@ -28,5 +28,4 @@ func (c *Controller) RegisterRoutes(r chi.Router) {
 			r.Get("/{id}", c.GetTask)
 		})
 	})
-
 }
